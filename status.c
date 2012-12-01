@@ -7,12 +7,16 @@
 
 char title[]="Status";
 char style[]="/style.css";
-char body[]="<img src=\"graph\" alt=\"graph\" />\n";
+char body[]=
+	"<h1>Status</h1>"
+	"<h2>Network graph</h2>"
+	"<img src=\"graph\" alt=\"graph\" />"
+	"";
 char *html[]={
 	"<!DOCTYPE html>",
 	"<html>",
 	"	<head>",
-	"		<link rel=\"stylesheet\" type=\"text/css\" href=\"", style, "\" />"
+	"		<link rel=\"stylesheet\" type=\"text/css\" href=\"", style, "\" />\n"
 	"		<title>", title, "</title>",
 	"	</head>",
 	"	<body>",
@@ -46,7 +50,7 @@ int main(int argc, char **argv) {
 	printf("Content-type: text/html; charset=utf-8\nStatus: 200 OK\n\n");
 	int i;
 	for(i=0; html[i]; i++)
-		printf("%s\n", html[i]);
+		printf("%s", html[i]);
 	
 	return 0;
 }
