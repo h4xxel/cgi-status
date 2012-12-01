@@ -6,11 +6,13 @@
 #include <arpa/inet.h>
 
 char title[]="Status";
+char style[]="/style.css";
 char body[]="<img src=\"graph\" alt=\"graph\" />\n";
 char *html[]={
 	"<!DOCTYPE html>",
 	"<html>",
 	"	<head>",
+	"		<link rel=\"stylesheet\" type=\"text/css\" href=\"", style, "\" />"
 	"		<title>", title, "</title>",
 	"	</head>",
 	"	<body>",
