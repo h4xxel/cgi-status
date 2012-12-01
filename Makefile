@@ -1,2 +1,5 @@
+CFLAGS+=-Wall -g -O0
+
 all:
-	$(CC) -g -O0 -o graph graph.c -lpng
+	$(CC) $(CFLAGS) -o status status.c
+	$(CC) $(CFLAGS) -o graph graph.c -lpng
