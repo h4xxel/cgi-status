@@ -55,7 +55,7 @@ void ifconf() {
 struct ifreq* ifstatus(char *interface) {
 	int i;
 	for(i=0; i<interfaces.num; i++)
-		if(!strcmp(interfaces.ifreqs[i].ifr_name, interface));
+		if(!strcmp(interface, interfaces.ifreqs[i].ifr_name))
 			return &interfaces.ifreqs[i];
 	return NULL;
 }
@@ -68,7 +68,7 @@ void status_lan() {
 	} else {
 		puts("<p>LAN is disconnected</p>");
 	}
-	puts("<br />");
+	puts("<hr />");
 }
 
 int main(int argc, char **argv) {
