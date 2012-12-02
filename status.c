@@ -65,7 +65,9 @@ void status_lan() {
 		html_body_add(html, html_tag_double("p", NULL, html_stack(2, 
 			html_tag_text("LAN is "),
 			html_tag_double("span", html_tag_attributes(1, "class", "connected"), 
-				html_tag_text("connected")))));
+				html_tag_text("connected")
+			)
+		)));
 		HTML_TAG *table=html_tag_double("table", NULL, NULL);
 		
 		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2,
@@ -95,6 +97,52 @@ void status_lan() {
 			html_tag_text("LAN is "),
 			html_tag_double("span", html_tag_attributes(1, "class", "disconnected"), 
 				html_tag_text("disconnected")))));
+	html_body_add(html, html_tag_single("hr", NULL));
+}
+
+void status_3g() {
+	const char *s_addr;
+	char *addr;
+	INTERFACE *ppp0=ifstatus("ppp0");
+	html_body_add(html, html_tag_double("h2", NULL, html_tag_text("LAN Status")));
+	if(ppp0&&(ppp0->flags&IFF_UP)) {
+		html_body_add(html, html_tag_double("p", NULL, html_stack(2, 
+			html_tag_text("3G is "),
+			html_tag_double("span", html_tag_attributes(1, "class", "connected"), 
+				html_tag_text("connected")
+			)
+		)));
+		HTML_TAG *table=html_tag_double("table", NULL, NULL);
+		
+		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2,
+			html_tag_double("th", NULL, html_tag_text("Interface")),
+			html_tag_double("td", NULL, html_tag_text(ppp0->name))
+		)));
+		
+		s_addr=inet_ntoa(ppp0->addr.sin_addr);
+		addr=malloc(strlen(s_addr)+1);
+		strcpy(addr, s_addr);
+		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+			html_tag_double("th", NULL, html_tag_text("IP Address")),
+			html_tag_double("td", NULL, html_tag_text(addr))
+		)));
+		
+		s_addr=inet_ntoa(ppp0->broadaddr.sin_addr);
+		addr=malloc(strlen(s_addr)+1);
+		strcpy(addr, s_addr);
+		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+			html_tag_double("th", NULL, html_tag_text("Broadcast")),
+			html_tag_double("td", NULL, html_tag_text(addr))
+		)));
+		
+		html_body_add(html, table);
+	} else
+		html_body_add(html, html_tag_double("p", NULL, html_stack(2, 
+			html_tag_text("3G is "),
+			html_tag_double("span", html_tag_attributes(1, "class", "disconnected"), 
+				html_tag_text("disconnected")
+			)
+		)));
 	html_body_add(html, html_tag_single("hr", NULL));
 }
 

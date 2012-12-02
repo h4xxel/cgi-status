@@ -27,7 +27,7 @@ typedef struct HTML_TAG {
 typedef struct HTML {
 	const char *doctype;
 	HTML_TAG *tags;
-	/*Used internally to speed up adding of elements*/
+	/*Used internally to speed up addition of elements*/
 	HTML_TAG *head;
 	HTML_TAG *head_last_element;
 	HTML_TAG *body;
