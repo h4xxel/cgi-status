@@ -54,16 +54,16 @@ void ifconf() {
 
 struct ifreq* ifstatus(char *interface) {
 	int i;
-	for(i=0; i<interfaces.num; i++) {
-		if(!strcmp(interfaces.ifreqs[i].ifr_name, interface);
+	for(i=0; i<interfaces.num; i++)
+		if(!strcmp(interfaces.ifreqs[i].ifr_name, interface));
 			return &interfaces.ifreqs[i];
 	return NULL;
 }
 
 void status_lan() {
-	struct ifreq eth0=ifstatus("eth0");
+	struct ifreq *eth0=ifstatus("eth0");
 	puts("<h2>LAN</h2>");
-	if(eth0&&(eth.ifr_flags&IFF_UP)) {
+	if(eth0&&(eth0->ifr_flags&IFF_UP)) {
 		puts("<p>LAN is connected</p>");
 	} else {
 		puts("<p>LAN is disconnected</p>");
