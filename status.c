@@ -80,8 +80,8 @@ char *uptime_string(long uptime) {
 		sprintf(s, "%li min, %li s", min, sec);
 		return s;
 	}
-	day=hour/60;
-	hour=hour%60;
+	day=hour/24;
+	hour=hour%24;
 	if(!day) {
 		sprintf(s, "%li h, %li min, %li s", hour, min, sec);
 		return s;
