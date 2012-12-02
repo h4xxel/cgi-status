@@ -11,6 +11,7 @@ typedef struct INTERFACE {
 	char name[IFNAMSIZ];
 	struct sockaddr_in addr;
 	struct sockaddr_in destaddr;
+	struct sockaddr_in netmask;
 	struct sockaddr_in broadaddr;
 	short flags;
 } INTERFACE;
@@ -43,7 +44,11 @@ void ifconf() {
 		if(!ioctl(sock, SIOCGIFFLAGS, (char *) &ifreqs[i]))
 			interfaces.interface[i].flags=ifreqs[i].ifr_flags;
 		if(!ioctl(sock, SIOCGIFBRDADDR, (char *) &ifreqs[i]))
-				memcpy(&interfaces.interface[i].broadaddr, &ifreqs[i].ifr_broadaddr, sizeof(struct sockaddr_in));
+			memcpy(&interfaces.interface[i].broadaddr, &ifreqs[i].ifr_broadaddr, sizeof(struct sockaddr_in));
+		if(!ioctl(sock, SIOCGIFNETMASK, (char *) &ifreqs[i]))
+			memcpy(&interfaces.interface[i].netmask, &ifreqs[i].ifr_netmask, sizeof(struct sockaddr_in));
+		if(!ioctl(sock, SIOCGIFDSTADDR, (char *) &ifreqs[i]))
+			memcpy(&interfaces.interface[i].destaddr, &ifreqs[i].ifr_dstaddr, sizeof(struct sockaddr_in));
 	}
 	close(sock);
 }
@@ -80,6 +85,14 @@ void status_lan() {
 		strcpy(addr, s_addr);
 		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
 			html_tag_double("th", NULL, html_tag_text("IP Address")),
+			html_tag_double("td", NULL, html_tag_text(addr))
+		)));
+		
+		s_addr=inet_ntoa(eth0->netmask.sin_addr);
+		addr=malloc(strlen(s_addr)+1);
+		strcpy(addr, s_addr);
+		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+			html_tag_double("th", NULL, html_tag_text("Netmask")),
 			html_tag_double("td", NULL, html_tag_text(addr))
 		)));
 		
@@ -127,11 +140,19 @@ void status_3g() {
 			html_tag_double("td", NULL, html_tag_text(addr))
 		)));
 		
-		s_addr=inet_ntoa(ppp0->broadaddr.sin_addr);
+		s_addr=inet_ntoa(ppp0->destaddr.sin_addr);
 		addr=malloc(strlen(s_addr)+1);
 		strcpy(addr, s_addr);
 		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
-			html_tag_double("th", NULL, html_tag_text("Broadcast")),
+			html_tag_double("th", NULL, html_tag_text("Destination")),
+			html_tag_double("td", NULL, html_tag_text(addr))
+		)));
+		
+		s_addr=inet_ntoa(ppp0->netmask.sin_addr);
+		addr=malloc(strlen(s_addr)+1);
+		strcpy(addr, s_addr);
+		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+			html_tag_double("th", NULL, html_tag_text("Netmask")),
 			html_tag_double("td", NULL, html_tag_text(addr))
 		)));
 		
