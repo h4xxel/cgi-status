@@ -10,8 +10,8 @@
 typedef struct INTERFACE {
 	char name[IFNAMSIZ];
 	struct sockaddr_in addr;
-	struct sockaddr destaddr;
-	struct sockaddr broadaddr;
+	struct sockaddr_in destaddr;
+	struct sockaddr_in broadaddr;
 	short flags;
 } INTERFACE;
 
@@ -40,10 +40,10 @@ void ifconf() {
 	for(i=0; i<interfaces.num; i++) {
 		strcpy(interfaces.interface[i].name, ifreqs[i].ifr_name);
 		memcpy(&interfaces.interface[i].addr, &ifreqs[i].ifr_addr, sizeof(struct sockaddr_in));
-		if(ioctl(sock, SIOCGIFFLAGS, (char *) &ifreqs[i]))
-			continue;
-		interfaces.interface[i].flags=ifreqs[i].ifr_flags;
-		//printf("interface %s is %s, address %s\n", ifreqs[i].ifr_name, ifreqs[i].ifr_flags&IFF_UP?"up":"down", inet_ntoa(((struct sockaddr_in *) &ifreqs[i].ifr_addr)->sin_addr));
+		if(!ioctl(sock, SIOCGIFFLAGS, (char *) &ifreqs[i]))
+			interfaces.interface[i].flags=ifreqs[i].ifr_flags;
+		if(!ioctl(sock, SIOCGIFBRDADDR, (char *) &ifreqs[i]))
+				memcpy(&interfaces.interface[i].broadaddr, &ifreqs[i].ifr_broadaddr, sizeof(struct sockaddr_in));
 	}
 	close(sock);
 }
@@ -57,22 +57,35 @@ struct INTERFACE* ifstatus(char *interface) {
 }
 
 void status_lan() {
+	const char *s_addr;
+	char *addr;
 	INTERFACE *eth0=ifstatus("eth0");
 	html_body_add(html, html_tag_double("h2", NULL, html_tag_text("LAN Status")));
 	if(eth0&&(eth0->flags&IFF_UP)) {
 		html_body_add(html, html_tag_double("p", NULL, html_tag_text("LAN is connected")));
 		HTML_TAG *row, *table=html_tag_double("table", NULL, NULL);
+		
 		row=html_tag_double("tr", NULL, NULL);
 		html_tag_add(row, html_tag_double("th", NULL, html_tag_text("Interface")));
 		html_tag_add(row, html_tag_double("td", NULL, html_tag_text(eth0->name)));
 		html_tag_add(table, row);
+		
 		row=html_tag_double("tr", NULL, NULL);
 		html_tag_add(row, html_tag_double("th", NULL, html_tag_text("IP Address")));
-		const char *s_ip=inet_ntoa(eth0->addr.sin_addr);
-		char *ip=malloc(strlen(s_ip)+1);
-		strcpy(ip, s_ip);
-		html_tag_add(row, html_tag_double("td", NULL, html_tag_text(ip)));
+		s_addr=inet_ntoa(eth0->addr.sin_addr);
+		addr=malloc(strlen(s_addr)+1);
+		strcpy(addr, s_addr);
+		html_tag_add(row, html_tag_double("td", NULL, html_tag_text(addr)));
 		html_tag_add(table, row);
+		
+		row=html_tag_double("tr", NULL, NULL);
+		html_tag_add(row, html_tag_double("th", NULL, html_tag_text("Broadcast Address")));
+		s_addr=inet_ntoa(eth0->broadaddr.sin_addr);
+		addr=malloc(strlen(s_addr)+1);
+		strcpy(addr, s_addr);
+		html_tag_add(row, html_tag_double("td", NULL, html_tag_text(addr)));
+		html_tag_add(table, row);
+		
 		html_body_add(html, table);
 	} else
 		html_body_add(html, html_tag_double("p", NULL, html_tag_text("LAN is disconnected")));
