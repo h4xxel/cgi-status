@@ -13,7 +13,7 @@ static struct {
 
 HTML *html;
 static const char title[]="Status";
-static const char style[]="/style.css";
+static const char stylesheet[]="/style.css";
 
 void ifconf() {
 	struct ifconf ifconf;
@@ -58,6 +58,7 @@ int main(int argc, char **argv) {
 	printf("Content-type: text/html; charset=utf-8\nStatus: 200 OK\n\n");
 	ifconf();
 	html=html_create(title);
+	html_head_add(html, html_tag_single("link", html_tag_attributes(3, "rel", "stylesheet", "type", "text/css", "href", stylesheet)));
 	status_lan();
 	html_write(html);
 	return 0;
