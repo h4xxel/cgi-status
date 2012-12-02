@@ -53,7 +53,7 @@ void status_lan() {
 		row=html_tag_double("tr", NULL, NULL);
 		html_tag_add(row, html_tag_double("td", NULL, html_tag_text("IP Address")));
 		const char *s_ip=inet_ntoa(((struct sockaddr_in *) &eth0->ifr_addr)->sin_addr);
-		char *ip=malloc(strlen(s_ip));
+		char *ip=malloc(strlen(s_ip)+1);
 		strcpy(ip, s_ip);
 		html_tag_add(row, html_tag_double("td", NULL, html_tag_text(ip)));
 		html_tag_add(table, row);
