@@ -66,28 +66,28 @@ void status_lan() {
 			html_tag_text("LAN is "),
 			html_tag_double("span", html_tag_attributes(1, "class", "connected"), 
 				html_tag_text("connected")))));
-		HTML_TAG *row, *table=html_tag_double("table", NULL, NULL);
+		HTML_TAG *table=html_tag_double("table", NULL, NULL);
 		
-		row=html_tag_double("tr", NULL, NULL);
-		html_tag_add(row, html_tag_double("th", NULL, html_tag_text("Interface")));
-		html_tag_add(row, html_tag_double("td", NULL, html_tag_text(eth0->name)));
-		html_tag_add(table, row);
+		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2,
+			html_tag_double("th", NULL, html_tag_text("Interface")),
+			html_tag_double("td", NULL, html_tag_text(eth0->name))
+		)));
 		
-		row=html_tag_double("tr", NULL, NULL);
-		html_tag_add(row, html_tag_double("th", NULL, html_tag_text("IP Address")));
 		s_addr=inet_ntoa(eth0->addr.sin_addr);
 		addr=malloc(strlen(s_addr)+1);
 		strcpy(addr, s_addr);
-		html_tag_add(row, html_tag_double("td", NULL, html_tag_text(addr)));
-		html_tag_add(table, row);
+		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+			html_tag_double("th", NULL, html_tag_text("IP Address")),
+			html_tag_double("td", NULL, html_tag_text(addr))
+		)));
 		
-		row=html_tag_double("tr", NULL, NULL);
-		html_tag_add(row, html_tag_double("th", NULL, html_tag_text("Broadcast")));
 		s_addr=inet_ntoa(eth0->broadaddr.sin_addr);
 		addr=malloc(strlen(s_addr)+1);
 		strcpy(addr, s_addr);
-		html_tag_add(row, html_tag_double("td", NULL, html_tag_text(addr)));
-		html_tag_add(table, row);
+		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+			html_tag_double("th", NULL, html_tag_text("Broadcast")),
+			html_tag_double("td", NULL, html_tag_text(addr))
+		)));
 		
 		html_body_add(html, table);
 	} else
