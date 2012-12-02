@@ -96,7 +96,7 @@ void status_system() {
 	)));
 	
 	html_body_add(html, table);
-	
+	html_body_add(html, html_tag_single("hr", NULL));
 }
 
 void status_lan() {
