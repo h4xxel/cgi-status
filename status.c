@@ -104,7 +104,7 @@ void status_3g() {
 	const char *s_addr;
 	char *addr;
 	INTERFACE *ppp0=ifstatus("ppp0");
-	html_body_add(html, html_tag_double("h2", NULL, html_tag_text("LAN Status")));
+	html_body_add(html, html_tag_double("h2", NULL, html_tag_text("3G Status")));
 	if(ppp0&&(ppp0->flags&IFF_UP)) {
 		html_body_add(html, html_tag_double("p", NULL, html_stack(2, 
 			html_tag_text("3G is "),
