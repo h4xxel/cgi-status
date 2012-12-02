@@ -175,6 +175,12 @@ int main(int argc, char **argv) {
 	html_body_add(html, html_tag_double("h1", NULL, html_tag_text(title)));
 	status_lan();
 	status_3g();
+	html_body_add(html, html_tag_double("small", NULL, html_stack(2, 
+		html_tag_text("cgi-status by"),
+		html_tag_double("a", html_tag_attributes(1, "href", "http://h4xxel.org/"), 
+			html_tag_text("h4xxel")
+		)
+	)));
 	html_write(html);
 	return 0;
 }
