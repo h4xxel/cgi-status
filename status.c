@@ -4,33 +4,16 @@
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <arpa/inet.h>
+#include "html.h"
 
 static struct {
 	struct ifreq ifreqs[32];
 	int num;
 } interfaces;
 
-char title[]="Status";
-char style[]="/style.css";
-char body[]=
-	"<h1>Status</h1>"
-	"<h2>System</h2>"
-	"<h2>3G</h2>"
-	"<img src=\"graph\" alt=\"graph\" />"
-	"";
-char *html[]={
-	"<!DOCTYPE html>",
-	"<html>",
-	"	<head>",
-	"		<link rel=\"stylesheet\" type=\"text/css\" href=\"", style, "\" />\n"
-	"		<title>", title, "</title>",
-	"	</head>",
-	"	<body>",
-	body,
-	"	</body>",
-	"</html>",
-	NULL,
-};
+HTML *html;
+static const char title[]="Status";
+static const char style[]="/style.css";
 
 void ifconf() {
 	struct ifconf ifconf;
@@ -62,21 +45,20 @@ struct ifreq* ifstatus(char *interface) {
 
 void status_lan() {
 	struct ifreq *eth0=ifstatus("eth0");
-	puts("<h2>LAN</h2>");
+	html_body_add(html, html_tag_double("h2", NULL, html_tag_text("LAN Status")));
 	if(eth0&&(eth0->ifr_flags&IFF_UP)) {
-		puts("<p>LAN is connected</p>");
+		html_body_add(html, html_tag_double("p", NULL, html_tag_text("LAN is connected")));
 	} else {
-		puts("<p>LAN is disconnected</p>");
+		html_body_add(html, html_tag_double("p", NULL, html_tag_text("LAN is disconnected")));
 	}
-	puts("<hr />");
+	html_body_add(html, html_tag_single("hr", NULL));
 }
 
 int main(int argc, char **argv) {
 	printf("Content-type: text/html; charset=utf-8\nStatus: 200 OK\n\n");
-	int i;
 	ifconf();
-	for(i=0; html[i]; i++)
-		printf("%s", html[i]);
+	html=html_create(title);
 	status_lan();
+	html_write(html);
 	return 0;
 }
