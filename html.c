@@ -5,10 +5,13 @@
 
 HTML *html_create(const char *title) {
 	HTML *html;
+	HTML_TAG *meta;
 	if(!(html=malloc(sizeof(HTML))))
 		return NULL;
 	html->doctype=html_doctype_html5;
-	html->head=html_tag_double("head", NULL, html_tag_double("title", NULL, html_tag_text(title)));
+	meta=html_tag_single("meta", html_tag_attributes(2, "http-equiv", "Content-Type", "content", "text/html; charset=utf-8"));
+	meta->next=html_tag_double("title", NULL, html_tag_text(title));
+	html->head=html_tag_double("head", NULL, meta);
 	html->body=html_tag_double("body", NULL, NULL);
 	html->head->next=html->body;
 	html->tags=html_tag_double("html", NULL, html->head);
