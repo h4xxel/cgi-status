@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/ioctl.h>
@@ -48,9 +49,17 @@ void status_lan() {
 	html_body_add(html, html_tag_double("h2", NULL, html_tag_text("LAN Status")));
 	if(eth0&&(eth0->ifr_flags&IFF_UP)) {
 		html_body_add(html, html_tag_double("p", NULL, html_tag_text("LAN is connected")));
-	} else {
+		HTML_TAG *row, *table=html_tag_double("table", NULL, NULL);
+		row=html_tag_double("tr", NULL, NULL);
+		html_tag_add(row, html_tag_double("td", NULL, html_tag_text("IP Address")));
+		const char *s_ip=inet_ntoa(((struct sockaddr_in *) &eth0->ifr_addr)->sin_addr);
+		char *ip=malloc(strlen(s_ip));
+		strcpy(ip, s_ip);
+		html_tag_add(row, html_tag_double("td", NULL, html_tag_text(ip)));
+		html_tag_add(table, row);
+		html_body_add(html, table);
+	} else
 		html_body_add(html, html_tag_double("p", NULL, html_tag_text("LAN is disconnected")));
-	}
 	html_body_add(html, html_tag_single("hr", NULL));
 }
 

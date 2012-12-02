@@ -37,6 +37,7 @@ typedef struct HTML {
 HTML *html_create(const char *title);
 void html_head_add(HTML *html, HTML_TAG *tag);
 void html_body_add(HTML *html, HTML_TAG *tag);
+void html_tag_add(HTML_TAG *tag, HTML_TAG *child);
 
 HTML_TAG *html_tag_text(const char *text);
 HTML_TAG *html_tag_single(const char *tag, HTML_TAG_ATTRIBUTE *attributes);

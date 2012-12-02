@@ -33,6 +33,12 @@ void html_body_add(HTML *html, HTML_TAG *tag) {
 		html->body->children=html->body_last_element=tag;
 }
 
+void html_tag_add(HTML_TAG *tag, HTML_TAG *child) {
+	HTML_TAG **t;
+	for(t=&tag->children; t&&*t; t=&(*t)->next);
+	*t=child;
+}
+
 HTML_TAG *html_tag_text(const char *text) {
 	HTML_TAG *tag;
 	if(!(tag=malloc(sizeof(HTML_TAG))))
