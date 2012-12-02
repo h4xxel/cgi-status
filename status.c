@@ -65,6 +65,8 @@ void status_lan() {
 		row=html_tag_double("tr", NULL, NULL);
 		html_tag_add(row, html_tag_double("th", NULL, html_tag_text("Interface")));
 		html_tag_add(row, html_tag_double("td", NULL, html_tag_text(eth0->name)));
+		html_tag_add(table, row);
+		row=html_tag_double("tr", NULL, NULL);
 		html_tag_add(row, html_tag_double("th", NULL, html_tag_text("IP Address")));
 		const char *s_ip=inet_ntoa(eth0->addr.sin_addr);
 		char *ip=malloc(strlen(s_ip)+1);
