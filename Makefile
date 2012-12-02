@@ -2,7 +2,8 @@ CFLAGS+=-Wall -g -O0
 PREFIX=/usr/local
 
 all:
-	$(CC) $(CFLAGS) -o status status.c
+	$(CC) $(CFLAGS) -c html.c
+	$(CC) $(CFLAGS) -o status status.c html.o
 	$(CC) $(CFLAGS) -o graph graph.c -lpng
 
 clean:
