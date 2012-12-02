@@ -153,6 +153,7 @@ int main(int argc, char **argv) {
 	html_head_add(html, html_tag_single("link", html_tag_attributes(3, "rel", "stylesheet", "type", "text/css", "href", stylesheet)));
 	html_body_add(html, html_tag_double("h1", NULL, html_tag_text(title)));
 	status_lan();
+	status_3g();
 	html_write(html);
 	return 0;
 }
