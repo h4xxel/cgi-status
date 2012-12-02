@@ -8,6 +8,7 @@ HTML *html_create(const char *title) {
 	if(!(html=malloc(sizeof(HTML))))
 		return NULL;
 	html->doctype=html_doctype_html5;
+	html->head_last_element=html->body_last_element=NULL;
 	html->head=html_tag_double("head", NULL, NULL);
 	html_head_add(html, html_tag_single("meta", html_tag_attributes(2, "http-equiv", "Content-Type", "content", "text/html; charset=utf-8")));
 	html_head_add(html, html_tag_double("title", NULL, html_tag_text(title)));

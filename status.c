@@ -51,7 +51,7 @@ void status_lan() {
 		html_body_add(html, html_tag_double("p", NULL, html_tag_text("LAN is connected")));
 		HTML_TAG *row, *table=html_tag_double("table", NULL, NULL);
 		row=html_tag_double("tr", NULL, NULL);
-		html_tag_add(row, html_tag_double("td", NULL, html_tag_text("IP Address")));
+		html_tag_add(row, html_tag_double("th", NULL, html_tag_text("IP Address")));
 		const char *s_ip=inet_ntoa(((struct sockaddr_in *) &eth0->ifr_addr)->sin_addr);
 		char *ip=malloc(strlen(s_ip)+1);
 		strcpy(ip, s_ip);
