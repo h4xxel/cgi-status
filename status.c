@@ -4,6 +4,7 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/utsname.h>
+#include <sys/sysinfo.h>
 #include <net/if.h>
 #include <arpa/inet.h>
 #include "html.h"
@@ -62,11 +63,42 @@ struct INTERFACE* ifstatus(char *interface) {
 	return NULL;
 }
 
+char *uptime_string(long uptime) {
+	static char s[64];
+	long sec, min, hour, day;
+	s[0]=0;
+	
+	min=uptime/60;
+	sec=uptime%60;
+	if(!min) {
+		sprintf(s, "%li s", sec);
+		return s;
+	}
+	hour=min/60;
+	min=min%60;
+	if(!hour) {
+		sprintf(s, "%li min, %li s", min, sec);
+		return s;
+	}
+	day=hour/60;
+	hour=hour%60;
+	if(!day) {
+		sprintf(s, "%li h, %li min, %li s", hour, min, sec);
+		return s;
+	}
+	
+	sprintf(s, "%li d, %li h, %li min, %li s", day, hour, min, sec);
+	return s;
+}
+
 void status_system() {
 	static char hostname[256];
 	static struct utsname uts;
+	static struct sysinfo info;
 	gethostname(hostname, sizeof(hostname));
 	uname(&uts);
+	sysinfo(&info);
+	
 	html_body_add(html, html_tag_double("h2", NULL, html_tag_text("System Status")));
 	HTML_TAG *table=html_tag_double("table", NULL, NULL);
 	
@@ -93,6 +125,14 @@ void status_system() {
 	html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
 		html_tag_double("th", NULL, html_tag_text("Architecture")),
 		html_tag_double("td", NULL, html_tag_text(uts.machine))
+	)));
+	
+	html_body_add(html, table);
+	table=html_tag_double("table", NULL, NULL);
+	
+	html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+		html_tag_double("th", NULL, html_tag_text("Uptime")),
+		html_tag_double("td", NULL, html_tag_text(uptime_string(info.uptime)))
 	)));
 	
 	html_body_add(html, table);
