@@ -5,13 +5,12 @@
 
 HTML *html_create(const char *title) {
 	HTML *html;
-	HTML_TAG *meta;
 	if(!(html=malloc(sizeof(HTML))))
 		return NULL;
 	html->doctype=html_doctype_html5;
-	meta=html_tag_single("meta", html_tag_attributes(2, "http-equiv", "Content-Type", "content", "text/html; charset=utf-8"));
-	meta->next=html_tag_double("title", NULL, html_tag_text(title));
-	html->head=html_tag_double("head", NULL, meta);
+	html->head=html_tag_double("head", NULL, NULL);
+	html_head_add(html, html_tag_single("meta", html_tag_attributes(2, "http-equiv", "Content-Type", "content", "text/html; charset=utf-8")));
+	html_head_add(html, html_tag_double("title", NULL, html_tag_text(title)));
 	html->body=html_tag_double("body", NULL, NULL);
 	html->head->next=html->body;
 	html->tags=html_tag_double("html", NULL, html->head);
@@ -19,16 +18,19 @@ HTML *html_create(const char *title) {
 }
 
 void html_head_add(HTML *html, HTML_TAG *tag) {
-	HTML_TAG **t;
-	for(t=&html->head->children; t&&*t; t=&(*t)->next);
-	*t=tag;
-	//for(html->head=tag; html->head->next; html->head=html->head->next);
+	if(html->head_last_element) {
+		html->head_last_element->next=tag;
+		for(html->head_last_element=tag; html->head->next; html->head=html->head->next);
+	} else
+		html->head->children=html->head_last_element=tag;
 }
 
 void html_body_add(HTML *html, HTML_TAG *tag) {
-	HTML_TAG **t;
-	for(t=&html->body->children; t&&*t; t=&(*t)->next);
-	*t=tag;
+	if(html->body_last_element) {
+		html->body_last_element->next=tag;
+		for(html->body_last_element=tag; html->body->next; html->body=html->body->next);
+	} else
+		html->body->children=html->body_last_element=tag;
 }
 
 HTML_TAG *html_tag_text(const char *text) {
