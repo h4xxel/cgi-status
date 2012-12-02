@@ -76,6 +76,24 @@ HTML_TAG *html_tag_double(const char *text, HTML_TAG_ATTRIBUTE *attributes, HTML
 	return tag;
 }
 
+HTML_TAG *html_stack(unsigned int n, ...) {
+	unsigned int i;
+	HTML_TAG *first=NULL, *t;
+	va_list argp;
+	va_start(argp, n);
+	for(i=0; i<n; i++)  {
+		if(!first) {
+			first=va_arg(argp, HTML_TAG *);
+			t=first;
+		} else {
+			t->next=va_arg(argp, HTML_TAG *);
+			t=t->next;
+		}
+	}
+	va_end(argp);
+	return first;
+}
+
 HTML_TAG_ATTRIBUTE *html_tag_attributes(unsigned int n, ...) {
 	//TODO: add malloc null check
 	HTML_TAG_ATTRIBUTE *attributes, *a;

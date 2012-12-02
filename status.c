@@ -62,7 +62,10 @@ void status_lan() {
 	INTERFACE *eth0=ifstatus("eth0");
 	html_body_add(html, html_tag_double("h2", NULL, html_tag_text("LAN Status")));
 	if(eth0&&(eth0->flags&IFF_UP)) {
-		html_body_add(html, html_tag_double("p", NULL, html_tag_text("LAN is connected")));
+		html_body_add(html, html_tag_double("p", NULL, html_stack(2, 
+			html_tag_text("LAN is "),
+			html_tag_double("span", html_tag_attributes(1, "class", "connected"), 
+				html_tag_text("connected")))));
 		HTML_TAG *row, *table=html_tag_double("table", NULL, NULL);
 		
 		row=html_tag_double("tr", NULL, NULL);
@@ -79,7 +82,7 @@ void status_lan() {
 		html_tag_add(table, row);
 		
 		row=html_tag_double("tr", NULL, NULL);
-		html_tag_add(row, html_tag_double("th", NULL, html_tag_text("Broadcast Address")));
+		html_tag_add(row, html_tag_double("th", NULL, html_tag_text("Broadcast")));
 		s_addr=inet_ntoa(eth0->broadaddr.sin_addr);
 		addr=malloc(strlen(s_addr)+1);
 		strcpy(addr, s_addr);
@@ -88,7 +91,10 @@ void status_lan() {
 		
 		html_body_add(html, table);
 	} else
-		html_body_add(html, html_tag_double("p", NULL, html_tag_text("LAN is disconnected")));
+		html_body_add(html, html_tag_double("p", NULL, html_stack(2, 
+			html_tag_text("LAN is "),
+			html_tag_double("span", html_tag_attributes(1, "class", "disconnected"), 
+				html_tag_text("disconnected")))));
 	html_body_add(html, html_tag_single("hr", NULL));
 }
 

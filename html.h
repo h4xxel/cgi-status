@@ -42,6 +42,7 @@ void html_tag_add(HTML_TAG *tag, HTML_TAG *child);
 HTML_TAG *html_tag_text(const char *text);
 HTML_TAG *html_tag_single(const char *tag, HTML_TAG_ATTRIBUTE *attributes);
 HTML_TAG *html_tag_double(const char *tag, HTML_TAG_ATTRIBUTE *attributes, HTML_TAG *children);
+HTML_TAG *html_stack(unsigned int n, ...);
 HTML_TAG_ATTRIBUTE *html_tag_attributes(unsigned int n, ...);
 
 void html_write(HTML *html);
