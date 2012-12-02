@@ -106,6 +106,7 @@ HTML_TAG_ATTRIBUTE *html_tag_attributes(unsigned int n, ...) {
 	a=attributes;
 	a->key=va_arg(argp, const char *);
 	a->value=va_arg(argp, const char *);
+	a->next=NULL;
 	for(i=1; i<n; i++) {
 		a->next=malloc(sizeof(HTML_TAG_ATTRIBUTE));
 		a=a->next;

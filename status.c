@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <sys/utsname.h>
 #include <net/if.h>
 #include <arpa/inet.h>
 #include "html.h"
@@ -59,6 +60,43 @@ struct INTERFACE* ifstatus(char *interface) {
 		if(!strcmp(interface, interfaces.interface[i].name))
 			return &interfaces.interface[i];
 	return NULL;
+}
+
+void status_system() {
+	static char hostname[256];
+	static struct utsname uts;
+	gethostname(hostname, sizeof(hostname));
+	uname(&uts);
+	html_body_add(html, html_tag_double("h2", NULL, html_tag_text("System Status")));
+	HTML_TAG *table=html_tag_double("table", NULL, NULL);
+	
+	html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+		html_tag_double("th", NULL, html_tag_text("Hostname")),
+		html_tag_double("td", NULL, html_tag_text(hostname))
+	)));
+	
+	html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+		html_tag_double("th", NULL, html_tag_text("System")),
+		html_tag_double("td", NULL, html_tag_text(uts.sysname))
+	)));
+	
+	html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+		html_tag_double("th", NULL, html_tag_text("Release")),
+		html_tag_double("td", NULL, html_tag_text(uts.release))
+	)));
+	
+	html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+		html_tag_double("th", NULL, html_tag_text("Version")),
+		html_tag_double("td", NULL, html_tag_text(uts.version))
+	)));
+	
+	html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+		html_tag_double("th", NULL, html_tag_text("Architecture")),
+		html_tag_double("td", NULL, html_tag_text(uts.machine))
+	)));
+	
+	html_body_add(html, table);
+	
 }
 
 void status_lan() {
@@ -169,18 +207,24 @@ void status_3g() {
 
 int main(int argc, char **argv) {
 	printf("Content-type: text/html; charset=utf-8\nStatus: 200 OK\n\n");
+	
 	ifconf();
+	
 	html=html_create(title);
 	html_head_add(html, html_tag_single("link", html_tag_attributes(3, "rel", "stylesheet", "type", "text/css", "href", stylesheet)));
 	html_body_add(html, html_tag_double("h1", NULL, html_tag_text(title)));
+	
+	status_system();
 	status_lan();
 	status_3g();
+	
 	html_body_add(html, html_tag_double("small", NULL, html_stack(2, 
 		html_tag_text("cgi-status by"),
 		html_tag_double("a", html_tag_attributes(1, "href", "http://h4xxel.org/"), 
 			html_tag_text("h4xxel")
 		)
 	)));
+	
 	html_write(html);
 	return 0;
 }
