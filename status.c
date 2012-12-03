@@ -189,14 +189,14 @@ void status_3g() {
 		sprintf(stat, "%u", ppp0->stats.rx_bytes);
 		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
 			html_tag_double("th", NULL, html_tag_text("Received")),
-			html_tag_double("td", NULL, html_tag_text(""))
+			html_tag_double("td", NULL, html_tag_text(stat))
 		)));
 		
 		stat=malloc(32);
 		sprintf(stat, "%u", ppp0->stats.tx_bytes);
 		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
 			html_tag_double("th", NULL, html_tag_text("Sent")),
-			html_tag_double("td", NULL, html_tag_text(""))
+			html_tag_double("td", NULL, html_tag_text(stat))
 		)));
 		
 		html_body_add(html, table);
