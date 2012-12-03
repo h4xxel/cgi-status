@@ -3,8 +3,9 @@ PREFIX=/usr/local
 
 all:
 	$(CC) $(CFLAGS) -c html.c
-	$(CC) $(CFLAGS) -o status status.c html.o
+	$(CC) $(CFLAGS) -c if.c
 	$(CC) $(CFLAGS) -o graph graph.c -lpng
+	$(CC) $(CFLAGS) -o status status.c if.o html.o
 
 clean:
 	rm -rf status graph

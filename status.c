@@ -1,67 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
-#include <sys/ioctl.h>
-#include <sys/utsname.h>
+#include <unistd.h>
 #include <sys/sysinfo.h>
-#include <net/if.h>
-#include <arpa/inet.h>
+#include <sys/utsname.h>
+#include "if.h"
 #include "html.h"
-
-typedef struct INTERFACE {
-	char name[IFNAMSIZ];
-	struct sockaddr_in addr;
-	struct sockaddr_in destaddr;
-	struct sockaddr_in netmask;
-	struct sockaddr_in broadaddr;
-	short flags;
-} INTERFACE;
-
-static struct {
-	INTERFACE interface[32];
-	int num;
-} interfaces;
 
 HTML *html;
 static const char title[]="Status";
 static const char stylesheet[]="/style.css";
-
-void ifconf() {
-	static struct ifreq ifreqs[32];
-	struct ifconf ifconf;
-	int sock;
-	int i;
-	memset(&ifconf, 0, sizeof(ifconf));
-	ifconf.ifc_req=ifreqs;
-	ifconf.ifc_len=sizeof(ifreqs);
-	if((sock=socket(PF_INET, SOCK_STREAM, 0))<0)
-		return;
-	if(ioctl(sock, SIOCGIFCONF, (char *) &ifconf))
-		return;
-	interfaces.num=ifconf.ifc_len/sizeof(struct ifreq);
-	for(i=0; i<interfaces.num; i++) {
-		strcpy(interfaces.interface[i].name, ifreqs[i].ifr_name);
-		memcpy(&interfaces.interface[i].addr, &ifreqs[i].ifr_addr, sizeof(struct sockaddr_in));
-		if(!ioctl(sock, SIOCGIFFLAGS, (char *) &ifreqs[i]))
-			interfaces.interface[i].flags=ifreqs[i].ifr_flags;
-		if(!ioctl(sock, SIOCGIFBRDADDR, (char *) &ifreqs[i]))
-			memcpy(&interfaces.interface[i].broadaddr, &ifreqs[i].ifr_broadaddr, sizeof(struct sockaddr_in));
-		if(!ioctl(sock, SIOCGIFNETMASK, (char *) &ifreqs[i]))
-			memcpy(&interfaces.interface[i].netmask, &ifreqs[i].ifr_netmask, sizeof(struct sockaddr_in));
-		if(!ioctl(sock, SIOCGIFDSTADDR, (char *) &ifreqs[i]))
-			memcpy(&interfaces.interface[i].destaddr, &ifreqs[i].ifr_dstaddr, sizeof(struct sockaddr_in));
-	}
-	close(sock);
-}
-
-struct INTERFACE* ifstatus(char *interface) {
-	int i;
-	for(i=0; i<interfaces.num; i++)
-		if(!strcmp(interface, interfaces.interface[i].name))
-			return &interfaces.interface[i];
-	return NULL;
-}
 
 char *uptime_string(long uptime) {
 	static char s[64];
@@ -193,7 +141,7 @@ void status_lan() {
 
 void status_3g() {
 	const char *s_addr;
-	char *addr;
+	char *addr, *stat;
 	INTERFACE *ppp0=ifstatus("ppp0");
 	html_body_add(html, html_tag_double("h2", NULL, html_tag_text("3G Status")));
 	if(ppp0&&(ppp0->flags&IFF_UP)) {
@@ -232,6 +180,23 @@ void status_3g() {
 		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
 			html_tag_double("th", NULL, html_tag_text("Netmask")),
 			html_tag_double("td", NULL, html_tag_text(addr))
+		)));
+		
+		html_body_add(html, table);
+		table=html_tag_double("table", NULL, NULL);
+		
+		stat=malloc(32);
+		sprintf(stat, "%u", ppp0->stats.rx_bytes);
+		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+			html_tag_double("th", NULL, html_tag_text("Received")),
+			html_tag_double("td", NULL, html_tag_text(""))
+		)));
+		
+		stat=malloc(32);
+		sprintf(stat, "%u", ppp0->stats.tx_bytes);
+		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+			html_tag_double("th", NULL, html_tag_text("Sent")),
+			html_tag_double("td", NULL, html_tag_text(""))
 		)));
 		
 		html_body_add(html, table);
