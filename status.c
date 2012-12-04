@@ -10,6 +10,7 @@
 HTML *html;
 static const char title[]="Status";
 static const char stylesheet[]="/style.css";
+static const char favicon[]="/favicon.png";
 
 char *uptime_string() {
 	static char s[64];
@@ -193,19 +194,19 @@ void status_3g() {
 			html_tag_double("td", NULL, html_tag_text(addr))
 		)));
 		
-		s_addr=inet_ntoa(ppp0->destaddr.sin_addr);
-		addr=malloc(strlen(s_addr)+1);
-		strcpy(addr, s_addr);
-		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
-			html_tag_double("th", NULL, html_tag_text("Destination")),
-			html_tag_double("td", NULL, html_tag_text(addr))
-		)));
-		
 		s_addr=inet_ntoa(ppp0->netmask.sin_addr);
 		addr=malloc(strlen(s_addr)+1);
 		strcpy(addr, s_addr);
 		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
 			html_tag_double("th", NULL, html_tag_text("Netmask")),
+			html_tag_double("td", NULL, html_tag_text(addr))
+		)));
+		
+		s_addr=inet_ntoa(ppp0->destaddr.sin_addr);
+		addr=malloc(strlen(s_addr)+1);
+		strcpy(addr, s_addr);
+		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+			html_tag_double("th", NULL, html_tag_text("Destination")),
 			html_tag_double("td", NULL, html_tag_text(addr))
 		)));
 		
@@ -240,6 +241,7 @@ int main(int argc, char **argv) {
 	
 	html=html_create(title);
 	html_head_add(html, html_tag_single("link", html_tag_attributes(3, "rel", "stylesheet", "type", "text/css", "href", stylesheet)));
+	html_head_add(html, html_tag_single("link", html_tag_attributes(3, "rel", "favicon", "type", "image/png", "href", favicon)));
 	html_body_add(html, html_tag_double("h1", NULL, html_tag_text(title)));
 	
 	status_system();
