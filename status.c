@@ -11,10 +11,13 @@ HTML *html;
 static const char title[]="Status";
 static const char stylesheet[]="/style.css";
 
-char *uptime_string(long uptime) {
+char *uptime_string() {
 	static char s[64];
+	static struct sysinfo info;
 	long sec, min, hour, day;
 	s[0]=0;
+	sysinfo(&info);
+	long uptime=info.uptime;
 	
 	min=uptime/60;
 	sec=uptime%60;
@@ -39,13 +42,24 @@ char *uptime_string(long uptime) {
 	return s;
 }
 
+char *bytes_string(unsigned int bytes) {
+	/*it is up to the caller to call free when done*/
+	static const char *suffix[]={"B", "kB", "MB", "GB"};
+	char *ret;
+	int i;
+	for(i=0; bytes/1024&&i<sizeof(suffix); i++)
+		bytes=(bytes+(bytes%1024>512)*1024)/1024;
+	
+	ret=malloc(32);
+	sprintf(ret, "%u %s", bytes, suffix[i]);
+	return ret;
+}
+
 void status_system() {
 	static char hostname[256];
 	static struct utsname uts;
-	static struct sysinfo info;
 	gethostname(hostname, sizeof(hostname));
 	uname(&uts);
-	sysinfo(&info);
 	
 	html_body_add(html, html_tag_double("h2", NULL, html_tag_text("System Status")));
 	HTML_TAG *table=html_tag_double("table", NULL, NULL);
@@ -80,7 +94,7 @@ void status_system() {
 	
 	html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
 		html_tag_double("th", NULL, html_tag_text("Uptime")),
-		html_tag_double("td", NULL, html_tag_text(uptime_string(info.uptime)))
+		html_tag_double("td", NULL, html_tag_text(uptime_string()))
 	)));
 	
 	html_body_add(html, table);
@@ -90,7 +104,7 @@ void status_system() {
 void status_lan() {
 	const char *s_addr;
 	char *addr;
-	INTERFACE *eth0=ifstatus("eth0");
+	INTERFACE *eth0=ifstatus("wlan0");
 	html_body_add(html, html_tag_double("h2", NULL, html_tag_text("LAN Status")));
 	if(eth0&&(eth0->flags&IFF_UP)) {
 		html_body_add(html, html_tag_double("p", NULL, html_stack(2, 
@@ -131,6 +145,19 @@ void status_lan() {
 		)));
 		
 		html_body_add(html, table);
+		table=html_tag_double("table", NULL, NULL);
+		
+		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+			html_tag_double("th", NULL, html_tag_text("Received")),
+			html_tag_double("td", NULL, html_tag_text(bytes_string(eth0->stats.rx_bytes)))
+		)));
+		
+		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
+			html_tag_double("th", NULL, html_tag_text("Sent")),
+			html_tag_double("td", NULL, html_tag_text(bytes_string(eth0->stats.tx_bytes)))
+		)));
+		
+		html_body_add(html, table);
 	} else
 		html_body_add(html, html_tag_double("p", NULL, html_stack(2, 
 			html_tag_text("LAN is "),
@@ -141,7 +168,7 @@ void status_lan() {
 
 void status_3g() {
 	const char *s_addr;
-	char *addr, *stat;
+	char *addr;
 	INTERFACE *ppp0=ifstatus("ppp0");
 	html_body_add(html, html_tag_double("h2", NULL, html_tag_text("3G Status")));
 	if(ppp0&&(ppp0->flags&IFF_UP)) {
@@ -185,18 +212,14 @@ void status_3g() {
 		html_body_add(html, table);
 		table=html_tag_double("table", NULL, NULL);
 		
-		stat=malloc(32);
-		sprintf(stat, "%u", ppp0->stats.rx_bytes);
 		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
 			html_tag_double("th", NULL, html_tag_text("Received")),
-			html_tag_double("td", NULL, html_tag_text(stat))
+			html_tag_double("td", NULL, html_tag_text(bytes_string(ppp0->stats.rx_bytes)))
 		)));
 		
-		stat=malloc(32);
-		sprintf(stat, "%u", ppp0->stats.tx_bytes);
 		html_tag_add(table, html_tag_double("tr", NULL, html_stack(2, 
 			html_tag_double("th", NULL, html_tag_text("Sent")),
-			html_tag_double("td", NULL, html_tag_text(stat))
+			html_tag_double("td", NULL, html_tag_text(bytes_string(ppp0->stats.tx_bytes)))
 		)));
 		
 		html_body_add(html, table);
