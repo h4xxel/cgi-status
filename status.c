@@ -241,7 +241,7 @@ int main(int argc, char **argv) {
 	
 	html=html_create(title);
 	html_head_add(html, html_tag_single("link", html_tag_attributes(3, "rel", "stylesheet", "type", "text/css", "href", stylesheet)));
-	html_head_add(html, html_tag_single("link", html_tag_attributes(3, "rel", "favicon", "type", "image/png", "href", favicon)));
+	html_head_add(html, html_tag_single("link", html_tag_attributes(3, "rel", "icon", "type", "image/png", "href", favicon)));
 	html_body_add(html, html_tag_double("h1", NULL, html_tag_text(title)));
 	
 	status_system();
