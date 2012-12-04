@@ -104,7 +104,7 @@ void status_system() {
 void status_lan() {
 	const char *s_addr;
 	char *addr;
-	INTERFACE *eth0=ifstatus("wlan0");
+	INTERFACE *eth0=ifstatus("eth0");
 	html_body_add(html, html_tag_double("h2", NULL, html_tag_text("LAN Status")));
 	if(eth0&&(eth0->flags&IFF_UP)) {
 		html_body_add(html, html_tag_double("p", NULL, html_stack(2, 
